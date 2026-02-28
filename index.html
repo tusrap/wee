@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Mon Site - Trouve un adversaire</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #1e7f3f, #14532d);
+            color: white;
+            text-align: center;
+        }
+
+        .container {
+            background: white;
+            color: black;
+            width: 90%;
+            max-width: 400px;
+            margin: 40px auto;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .result {
+            margin-top: 20px;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        .joueur {
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f4f4f4;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Joueurs Disponibles</h2>
+        <div class="result" id="resultat"></div>
+    </div>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+        // Remplace par ton URL et ta clé API Supabase
+        const supabaseUrl = 'https://fqwutpdwvylxpqgegqnv.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxd3V0cGR3dnlseHBxZ2VncW52Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyNzYxMjYsImV4cCI6MjA4Nzg1MjEyNn0.t2Y6F4DAR8lfeGDAaBK7xdL5ZgiCvbtuPldEJ2nsLDA';
+        const supabase = createClient(supabaseUrl, supabaseKey);
+
+        // Fonction pour récupérer et afficher les joueurs
+        async function chargerJoueurs() {
+            const { data, error } = await supabase.from('joueurs').select('nom, ville');  // Récupère seulement nom et ville
+
+            const resultatDiv = document.getElementById('resultat');
+            resultatDiv.innerHTML = ''; // Efface les résultats précédents
+
+            if (error) {
+                resultatDiv.innerHTML = `Erreur : ${error.message}`;
+                return;
+            }
+
+            // Si aucun joueur n'est trouvé
+            if (data.length === 0) {
+                resultatDiv.innerHTML = 'Aucun joueur trouvé.';
+            } else {
+                // Affiche chaque joueur
+                data.forEach(joueur => {
+                    const div = document.createElement('div');
+                    div.className = 'joueur';
+                    div.textContent = `${joueur.nom} - ${joueur.ville || 'Ville non définie'}`;
+                    resultatDiv.appendChild(div);
+                });
+            }
+        }
+
+        // Charger les joueurs dès le chargement de la page
+        window.onload = chargerJoueurs;
+    </script>
+
+</body>
+
+</html>
